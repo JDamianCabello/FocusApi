@@ -2,37 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Subject;
 use App\User;
+use http\Env\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
-    function index(Request $request)
+    function listSubject(Request $request)
     {
+
+        $user = User::where('api_token', $request->header('Api-Token'))->first();
             //Esto usa Eloquent para sacar los datos
-            $user = User::all();
-            return response()->json($user, 200);
+            $subject = Subject::where('idUser',$user['id']);
+            return response()->json($subject, 200);
     }
 
-    function createUser(Request $request){
-            $user = User::where('email', $request->email)->first();
+    function createSubject(Request $request){
+            $user = User::where('api_token', $request->header('Api-Token'))->first();
+        $subject = Subject::create([
+            'idUser' => $user['id'],
+            'subject_name' => $request->subject_name,
+            'estate_priority' => $request->estate_priority,
+        ]);
 
-            if(is_null($user)){
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                    'api_token' => Str::random(60)
-                ]);
-
-                return response()->json(['message'=>'created','user'=> $user], 201);
-            }
-            else{
-                return response()->json(['message'=>'duplicate email','user'=> null], 201);
-            }
+        return response()->json(['message' => 'subject created sucefully', 'subject' => $subject], 201);
 	}
 
 
@@ -55,21 +51,26 @@ class UsersController extends Controller
             }
     }
 
-    function delete(Request $request)
+    function delete(Request $request, $id)
     {
-        User::where('api_token', $request->header('Api-Token'))->first()->delete();
-            return response('Deleted Successfully', 200);
+        Subject::findOrFail($id)->delete();
+        return response('Subject eleted Successfully', 200);
     }
 
     public function update($id, Request $request)
     {
+        if ($request->isJson()) {
+            $data = $request->json()->all();
             $user = User::findOrFail($id);
             $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password)
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password'])
             ]);
 
             return response()->json($user, 200);
+        }
+
+        return response()->json(['ERROR' => 'Unauthorized'],401,[]);
     }
 }

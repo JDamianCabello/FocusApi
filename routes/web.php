@@ -15,11 +15,16 @@ $router->post('/login', ['uses'=>'UsersController@getToken']);
 $router->post('/register', ['uses'=>'UsersController@createUser']);
 
 $router->group(['middleware' => ['auth']], function () use ($router){
-    $router->get('/users', ['uses'=>'UsersController@index']);
 
-    $router->delete('users/{id}', ['uses' => 'UsersController@delete']);
+
+
+
 });
 
+$router->get('/users', ['uses'=>'UsersController@index']);
+$router->delete('users', ['uses' => 'UsersController@delete']);
+$router->post('/subject',['uses'=>'SubjectsController@createSubject']);
+$router->get('/subject',['uses'=>'SubjectsController@listSubject']);
 
 
 $router->get('/', function () use ($router) {
