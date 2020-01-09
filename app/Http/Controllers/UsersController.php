@@ -23,49 +23,65 @@ class UsersController extends Controller
     }
 
     function createUser(Request $request){
+            $user = User::where('email', $request->email)->first();
+
+            if(is_null($user)){
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'api_token' => Str::random(60)
+                ]);
+
+                return response()->json(['message'=>'created','user'=> $user], 201);
+            }
+            else{
+                return response()->json(['message'=>'duplicate email','user'=> null], 201);
+            }
+	}
+
+
+    function getToken(Request $request)
+    {
+            try {
+                
+                $user = User::where('email', $request->email)->first();
+
+                if(is_null($user))
+                    throw new ModelNotFoundException();
+
+                if ($user && Hash::check($request->password, $user->password)) {
+                    return response()->json(['error'=>'false','message'=>'logged','api_token'=> $user['api_token']], 200);
+                } else {
+                    return response()->json(['error'=>'true','message'=>'wrong login','api_token'=> ""], 406);
+                }
+            } catch (ModelNotFoundException $e) {
+                return response()->json(['error'=>'true','message'=>'email not in database','api_token'=> null], 406);
+            }
+    }
+
+    function delete(Request $request, $id)
+    {
         if ($request->isJson()) {
-            //Recogemos los datos
-            $data = $request->json()->all();
-
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'api_token' => Str::random(60)
-
-            ]);
-
-            return response()->json($user, 201);
+            User::findOrFail($id)->delete();
+            return response('Deleted Successfully', 200);
         }
 
         return response()->json(['ERROR' => 'Unauthorized'],401,[]);
     }
 
-    function getToken(Request $request)
+    public function update($id, Request $request)
     {
         if ($request->isJson()) {
-            try {
-                $data = $request->json()->all();
-                $user = User::where('email', $data['email'])->first();
+            $data = $request->json()->all();
+            $user = User::findOrFail($id);
+            $user->update([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password'])
+            ]);
 
-                if ($user && Hash::check($data['password'], $user->password)) {
-                    return response()->json($user, 200);
-                } else {
-                    return response()->json(['error' => 'No content'], 406);
-                }
-            } catch (ModelNotFoundException $e) {
-                return response()->json(['error' => 'No content'], 406);
-            }
-        } else {
-            return response()->json(['error' => 'Unauthorized'], 401, []);
-        }
-    }
-
-    public function delete(Request $request, $id)
-    {
-        if ($request->isJson()) {
-            User::findOrFail($id)->delete();
-            return response('Deleted Successfully', 200);
+            return response()->json($user, 200);
         }
 
         return response()->json(['ERROR' => 'Unauthorized'],401,[]);

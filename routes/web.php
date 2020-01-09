@@ -11,8 +11,8 @@
 |
 */
 
-$router->post('/users/login', ['uses'=>'UsersController@getToken']);
-$router->post('/users', ['uses'=>'UsersController@createUser']);
+$router->post('/login', ['uses'=>'UsersController@getToken']);
+$router->post('/register', ['uses'=>'UsersController@createUser']);
 
 $router->group(['middleware' => ['auth']], function () use ($router){
     $router->get('/users', ['uses'=>'UsersController@index']);
