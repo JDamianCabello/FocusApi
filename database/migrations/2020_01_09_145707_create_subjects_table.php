@@ -22,7 +22,7 @@ class CreateSubjectsTable extends Migration
                 ->onDelete('cascade');
             $table->string('subject_name',50);
             $table->enum('estate_priority',['0','1','2','3']);
-            $table->timestamp('created_on',0);
+            $table->timestamps();
         });
     }
 

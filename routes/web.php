@@ -16,15 +16,22 @@ $router->post('/register', ['uses'=>'UsersController@createUser']);
 
 $router->group(['middleware' => ['auth']], function () use ($router){
 
+    $router->group(['prefix' => 'users'], function () use ($router) {
+        $router->get('/', ['uses' => 'UsersController@index']);
+        $router->delete('/', ['uses' => 'UsersController@delete']);
+    });
 
+    $router->group(['prefix' => 'subject'], function () use ($router) {
+        $router->post('/', ['uses' => 'SubjectsController@add']);
+        $router->get('/', ['uses' => 'SubjectsController@list']);
+        $router->put('/{id}', ['uses' => 'SubjectsController@update']);
+        $router->delete('/{id}', ['uses' => 'SubjectsController@delete']);
+    });
 
 
 });
 
-$router->get('/users', ['uses'=>'UsersController@index']);
-$router->delete('users', ['uses' => 'UsersController@delete']);
-$router->post('/subject',['uses'=>'SubjectsController@createSubject']);
-$router->get('/subject',['uses'=>'SubjectsController@listSubject']);
+
 
 
 $router->get('/', function () use ($router) {
