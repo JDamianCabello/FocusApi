@@ -11,8 +11,8 @@ class Subject extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'id', 'idUser', 'subject_name','state_priority','created_on'
+       protected $fillable = [
+         'idUser','subject_name','state_priority'
     ];
 
     /**
@@ -21,5 +21,7 @@ class Subject extends Model
      * @var array
      */
     protected $hidden = [
+        'idUser', 'created_at', 'updated_at'
     ];
 }
+

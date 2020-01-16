@@ -6,24 +6,26 @@ use App\Subject;
 use App\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use function MongoDB\BSON\toJSON;
 
 class SubjectsController extends Controller
 {
-    function list(Request $request)
+        function list(Request $request)
     {
-
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $subject = Subject::all()->where('idUser',$user->id);
-        return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject], 200);
+        return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
+
     }
 
     function add(Request $request){
         $user = User::where('api_token', $request->header('Api-Token'))->first();
+
+//dd($request->estate_priority);
+
         $subject = Subject::create([
-            'idUser' => $user['id'],
+            'idUser' => $user->id,
             'subject_name' => $request->subject_name,
-            'estate_priority' => $request->estate_priority,
+            'estate_priority' => $request->estate_priority
         ]);
 
         return response()->json(['error'=>'false','message' => 'subject created sucefully', 'subject' => $subject], 201);
