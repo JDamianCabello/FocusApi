@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Subject;
 use App\User;
+use App\Topic;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,11 @@ class SubjectsController extends Controller
     {
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $subject = Subject::all()->where('idUser',$user->id);
+
+	foreach($subject as &$tmp){
+		$tmp->topicList = Topic::all()->where('idSubject', $tmp->id)->values();
+	}
+
         return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
 
     }

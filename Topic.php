@@ -12,7 +12,7 @@ class Subject extends Model
      * @var array
      */
        protected $fillable = [
-         'idUser','name','date','color'
+         'idUser','subject_name','state_priority'
     ];
 
     /**
