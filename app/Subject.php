@@ -21,7 +21,7 @@ class Subject extends Model
      * @var array
      */
     protected $hidden = [
-        'idUser', 'created_at', 'updated_at'
+        'id','idUser', 'created_at', 'updated_at'
     ];
 }
 
