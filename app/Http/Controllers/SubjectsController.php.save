@@ -10,15 +10,13 @@ use Illuminate\Http\Request;
 
 class SubjectsController extends Controller
 {
-        function list(Request $request)
-    {
+    function list(Request $request){
+
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $subject = Subject::all()->where('idUser',$user->id);
-
-// Esto recoge todos los temas de una asignatura dado ese id y los envia junto a la asignatura
-//	foreach($subject as &$tmp){
-//		$tmp->topicList = Topic::all()->where('idSubject', $tmp->id)->values();
-//	}
+	foreach($subject as &$tmp){
+		$tmp->topicList = Topic::all()->where('idSubject', $tmp->id);
+	}
 
         return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
 
@@ -27,14 +25,12 @@ class SubjectsController extends Controller
     function add(Request $request){
         $user = User::where('api_token', $request->header('Api-Token'))->first();
 
-	//dd(date('Y-m-d',strtotime($request->date)));  Esta línea convierte el formato dd-MM-yyyy en formato yyyy-MM-dd que es aceptado por la base de datos
+//dd($request->estate_priority);
 
         $subject = Subject::create([
             'idUser' => $user->id,
             'subject_name' => $request->subject_name,
-            'exam_date' => date('Y-m-d',strtotime($request->date)),
-	    'color' => $request->color,
-            'iconId' => $request->iconId
+            'estate_priority' => $request->estate_priority
         ]);
 
         return response()->json(['error'=>'false','message' => 'subject created sucefully', 'subject' => $subject], 201);

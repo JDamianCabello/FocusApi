@@ -23,6 +23,7 @@ class CreateSubjectsTable extends Migration
             $table->string('subject_name',50);
             $table->date('exam_date');
 	    $table->integer('color');
+	    $table->integer('iconId');
 	    $table->timestamps();
         });
     }

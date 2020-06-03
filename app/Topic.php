@@ -13,7 +13,7 @@ class Topic extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'state'
+        'name', 'state', 'priority', 'notes','isTask'
     ];
 
     /**
@@ -22,7 +22,7 @@ class Topic extends Model
      * @var array
      */
     protected $hidden = [
-	'id','idSubject', 'created_at', 'updated_at'
+	'idSubject', 'created_at', 'updated_at'
 
     ];
 }

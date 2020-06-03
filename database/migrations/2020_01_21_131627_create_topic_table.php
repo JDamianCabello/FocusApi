@@ -21,7 +21,10 @@ class CreateTopicTable extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->string('name',50);
+	    $table->boolean('isTask');
             $table->enum('state',['0','1','2','3']);
+      	    $table->enum('priority',['0','1','2']);
+	    $table->string('notes',250)->nullable();
             $table->timestamps();
         });
     }

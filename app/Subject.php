@@ -12,7 +12,7 @@ class Subject extends Model
      * @var array
      */
        protected $fillable = [
-         'idUser','name','date','color'
+         'idUser','subject_name','exam_date','color','iconId'
     ];
 
     /**
@@ -21,7 +21,7 @@ class Subject extends Model
      * @var array
      */
     protected $hidden = [
-        'id','idUser', 'created_at', 'updated_at'
+        'idUser', 'created_at', 'updated_at'
     ];
 }
 
