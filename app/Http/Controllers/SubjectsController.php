@@ -18,12 +18,17 @@ class SubjectsController extends Controller
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $subject = Subject::all()->where('idUser',$user->id);
 
-//Esto recoge todos los temas de una asignatura dado ese id y calcula el porcentaje de la asignatura
+	//Esto recoge todos los temas de una asignatura dado ese id y calcula el porcentaje de la asignatura
 	foreach($subject as &$tmp){
 		$topics = Topic::all()->where('idSubject', $tmp->id)->sum('state');
-		$totalSubjectTopics = Topic::all()->where('idSubject',$tmp->id)->count();
-
-		$tmp->percent = ($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE);
+		$tmp->exam_date = date('d-m-Y',strtotime($tmp->exam_date));
+		if($topics == 0){
+			$tmp->percent = 0;
+		}
+		else{
+			$totalSubjectTopics = Topic::all()->where('idSubject',$tmp->id)->count();
+			$tmp->percent = ($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE);
+		}
 	};
 
         return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
