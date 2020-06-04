@@ -28,11 +28,12 @@ $router->group(['middleware' => ['auth']], function () use ($router){
         $router->delete('/{id}', ['uses' => 'SubjectsController@delete']);
     });
 
-
-});
-
-
-
+    $router->group(['prefix' => 'topic'], function () use ($router) {
+        $router->post('/{id}', ['uses' => 'TopicsController@add']);
+        $router->get('/{id}', ['uses' => 'TopicsController@list']);});
+        $router->put('/{id}', ['uses' => 'TopicsController@update']);
+        $router->delete('/{id}', ['uses' => 'TopicsController@delete']);
+    });
 
 $router->get('/', function () use ($router) {
     return $router->app->version();

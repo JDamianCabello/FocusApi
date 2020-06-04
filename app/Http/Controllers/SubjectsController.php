@@ -10,15 +10,21 @@ use Illuminate\Http\Request;
 
 class SubjectsController extends Controller
 {
-        function list(Request $request)
-    {
+
+   function list(Request $request){
+
+	$TOTALMAXTOPICSTATE = 3;
+
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $subject = Subject::all()->where('idUser',$user->id);
 
-// Esto recoge todos los temas de una asignatura dado ese id y los envia junto a la asignatura
-//	foreach($subject as &$tmp){
-//		$tmp->topicList = Topic::all()->where('idSubject', $tmp->id)->values();
-//	}
+//Esto recoge todos los temas de una asignatura dado ese id y calcula el porcentaje de la asignatura
+	foreach($subject as &$tmp){
+		$topics = Topic::all()->where('idSubject', $tmp->id)->sum('state');
+		$totalSubjectTopics = Topic::all()->where('idSubject',$tmp->id)->count();
+
+		$tmp->percent = ($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE);
+	};
 
         return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
 

@@ -8,32 +8,30 @@ use App\Topic;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
-class SubjectsController extends Controller
+class TopicsController extends Controller
 {
-    function list(Request $request){
-
+        function list(Request $request, $idSubject)
+    {
         $user = User::where('api_token', $request->header('Api-Token'))->first();
-        $subject = Subject::all()->where('idUser',$user->id);
-	foreach($subject as &$tmp){
-		$tmp->topicList = Topic::all()->where('idSubject', $tmp->id);
-	}
+        $topics = Topic::all()->where('idSubject',$idSubject);
 
-        return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
+        return response()->json(['error'=>'false','count'=>$topics->count(),'topicList' => $topics->values()], 200);
 
     }
 
-    function add(Request $request){
+    function add(Request $request, $idSubject){
         $user = User::where('api_token', $request->header('Api-Token'))->first();
 
-//dd($request->estate_priority);
-
-        $subject = Subject::create([
-            'idUser' => $user->id,
-            'subject_name' => $request->subject_name,
-            'estate_priority' => $request->estate_priority
+        $topic = Topic::create([
+            'idSubject' => $idSubject,
+            'name' => $request->name,
+            'isTask' => $request->isTask,
+	    'state' => $request->state,
+            'priority' => $request->priority,
+   	    'notes' => $request->notes
         ]);
 
-        return response()->json(['error'=>'false','message' => 'subject created sucefully', 'subject' => $subject], 201);
+        return response()->json(['error'=>'false','message' => 'topic created sucefully', 'topic' => $topic], 201);
 	}
 
 
