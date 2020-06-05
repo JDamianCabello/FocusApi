@@ -63,9 +63,10 @@ class SubjectsController extends Controller
             return response()->json(['error' => 'true', 'message' => 'the subject does not exist','subject'=>null], 202);
         }
         if($user->id ==$subject->idUser) {
+	    $topicsDeleted =  Topic::all()->where('idSubject', $subject->id);
             $subject->delete();
 
-            return response()->json(['error' => 'false', 'message' => 'Subject deleted Successfully','subject'=>$subject], 200);
+            return response()->json(['error' => 'false', 'message' => 'Subject deleted Successfully','deletedSubject'=>$subject, 'topicsDeleted'=>$topicsDeleted->values()], 200);
         }
         else
             return response()->json(['error' => 'false', 'message' => 'not your subject', 'deleted subject' => null], 200);
@@ -76,15 +77,19 @@ class SubjectsController extends Controller
 
     public function update($id, Request $request)
     {
+	$oldSubject = null;
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $subject = Subject::findOrFail($id);
         if($user->id ==$subject->idUser) {
+	    $oldSubject = $subject;
             Subject::findOrFail($id)->update([
                 'subject_name' => $request->subject_name,
-                'estate_priority' => $request->estate_priority,
+                'exam_date' => date('Y-m-d',strtotime($request->date)),
+                'color' => $request->color,
+                'iconId' => $request->iconId
             ]);
 
-            return response()->json(['error' => 'false', 'message' => 'subject updated'], 200);
+            return response()->json(['error' => 'false', 'message' => 'subject updated', 'oldSubject'=>$oldSubject, 'updatedSubject'=>$subject], 200);
         }
         else
             return response()->json(['error' => 'false', 'message' => 'not your subject', 'subject' => null], 200);

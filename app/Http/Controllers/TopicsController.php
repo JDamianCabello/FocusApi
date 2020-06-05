@@ -41,17 +41,18 @@ class TopicsController extends Controller
     {
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         try {
-            $subject = Subject::findOrFail($id);
+            $topic = Topic::findOrFail($id);
         }catch (ModelNotFoundException $e){
-            return response()->json(['error' => 'true', 'message' => 'the subject does not exist','subject'=>null], 202);
+            return response()->json(['error' => 'true', 'message' => 'the topic does not exist','topic'=>null], 202);
         }
-        if($user->id ==$subject->idUser) {
-            $subject->delete();
+	$subject = Subject::where('id',$topic->idSubject)->first();
+        if($user->id == $subject->id) {
+            $topic->delete();
 
-            return response()->json(['error' => 'false', 'message' => 'Subject deleted Successfully','subject'=>$subject], 200);
+            return response()->json(['error' => 'false', 'message' => 'Topic deleted Successfully','topic'=>$topic], 200);
         }
         else
-            return response()->json(['error' => 'false', 'message' => 'not your subject', 'deleted subject' => null], 200);
+            return response()->json(['error' => 'false', 'message' => 'Not your topic', 'deleted topic' => null], 200);
 
 
 
@@ -60,16 +61,22 @@ class TopicsController extends Controller
     public function update($id, Request $request)
     {
         $user = User::where('api_token', $request->header('Api-Token'))->first();
-        $subject = Subject::findOrFail($id);
-        if($user->id ==$subject->idUser) {
+        $topic = Topic::findOrFail($id);
+	$subject = Subject::where('id',$topic->idSubject)->first();
+
+	$oldTopic = $topic;
+        if($user->id == $subject->idUser) {
             Subject::findOrFail($id)->update([
-                'subject_name' => $request->subject_name,
-                'estate_priority' => $request->estate_priority,
+                'name' => $request->name,
+                'isTask' => $request->isTask,
+                'state' => $request->state,
+                'priority' => $request->priority,
+                'notes' => $request->notes
             ]);
 
-            return response()->json(['error' => 'false', 'message' => 'subject updated'], 200);
+            return response()->json(['error' => 'false', 'message' => 'topic updated', 'oldTopic'=>$oldTopic, 'updatedTopic'=>$topic], 200);
         }
         else
-            return response()->json(['error' => 'false', 'message' => 'not your subject', 'subject' => null], 200);
+            return response()->json(['error' => 'false', 'message' => 'Not your topic', 'topic' => null], 200);
     }
 }
