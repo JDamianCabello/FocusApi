@@ -27,11 +27,11 @@ class SubjectsController extends Controller
 		}
 		else{
 			$totalSubjectTopics = Topic::all()->where('idSubject',$tmp->id)->count();
-			$tmp->percent = ($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE);
+			$tmp->percent = (int)(($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE));
 		}
 	};
 
-        return response()->json(['error'=>'false','count'=>$subject->count(),'subjects' => $subject->values()], 200);
+        return response()->json(['error'=>false,'count'=>$subject->count(),'subjects' => $subject->values()], 200);
 
     }
 

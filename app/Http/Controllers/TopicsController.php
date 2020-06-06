@@ -15,23 +15,13 @@ class TopicsController extends Controller
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         $topics = Topic::all()->where('idSubject',$idSubject);
 
-        return response()->json(['error'=>'false','count'=>$topics->count(),'topicList' => $topics->values()], 200);
+	foreach($topics as &$tmp){
+		$tmp->state = (int)$tmp->state;
+		$tmp->priority = (int)$tmp ->priority;
+		$tmp->isTask = $tmp->isTask == 0 ? false : true;
+	}
 
-    }
-
-    function add(Request $request, $idSubject){
-        $user = User::where('api_token', $request->header('Api-Token'))->first();
-
-        $topic = Topic::create([
-            'idSubject' => $idSubject,
-            'name' => $request->name,
-            'isTask' => $request->isTask,
-	    'state' => $request->state,
-            'priority' => $request->priority,
-   	    'notes' => $request->notes
-        ]);
-
-        return response()->json(['error'=>'false','message' => 'topic created sucefully', 'topic' => $topic], 201);
+        return response()->json(['error'=>false,'message' => 'topic list', 'topicList' => $topics->values()], 200);
 	}
 
 
