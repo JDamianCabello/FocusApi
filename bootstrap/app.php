@@ -81,11 +81,24 @@ $app->singleton(
 // $app->register(App\Providers\EventServiceProvider::class);
 
 //Para implementar el correo en la API
-$app->register(Illuminate\Mail\MailServiceProvider::class);
+//$app->register(Illuminate\Mail\MailServiceProvider::class);
+//$app->configure('mail');
+//$app->alias('mailer', Illuminate\Mail\Mailer::class);
+//$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+//$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
+
 $app->configure('mail');
-$app->alias('mailer', Illuminate\Mail\Mailer::class);
-$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
-$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
+$app->configure('services');
+$app->register(Sichikawa\LaravelSendgridDriver\MailServiceProvider::class);
+
+unset($app->availableBindings['mailer']);
+
+
+collect(scandir(__DIR__ . '/../config'))->each(function ($item) use ($app) {
+    $app->configure(basename($item, '.php'));
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
@@ -102,5 +115,9 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
+
+
+
+
 
 return $app;

@@ -1,0 +1,11 @@
+<html>
+<head>
+    <title>Test Mail</title>
+</head>
+<body>
+	<h1>Hey {{$user}} welcome to Focus,</h1>
+	<p>{{$mesage}}</p>
+
+	<p>here is your validate email code: {{$code}}</p>
+</body>
+</html>

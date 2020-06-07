@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use \Illuminate\Mail\Message;
 
 class UsersController extends Controller
 {
@@ -20,13 +22,25 @@ class UsersController extends Controller
     function createUser(Request $request){
             $user = User::where('email', $request->email)->first();
 
-            if(is_null($user)){
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                    'api_token' => Str::random(60)
-                ]);
+        if(is_null($user)){
+        	$user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+	        'api_token' => Str::random(60)
+        ]);
+
+        $mesage = ' we are excited to see you join in our team!';
+        $code = Str::random(50);
+
+        Mail::send('emails.register', ['user' => $user->name, 'mesage'=>$mesage, 'code'=>$code], function ($m) use ($user) {
+            $m->from('mail.focusapp@gmail.com', 'Focus Team');
+
+            $m->to($user->email, $user->name)->subject('Welcome to focus!');
+        });
+
+
+
 
                 return response()->json(['message'=>'created','user'=> $user], 201);
             }

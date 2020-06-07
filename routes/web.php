@@ -1,5 +1,12 @@
 <?php
 
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Mail;
+use \Illuminate\Mail\Message;
+use App\User;
+
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -10,6 +17,21 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+
+$router->get('/test_mail', function (Request $request) {
+	$user = User::where('api_token', $request->header('Api-Token'))->first();
+	$mesage = ' we are excited to see you join in our team!';
+	$code = 123456;
+
+        Mail::send('emails.register', ['user' => $user->name, 'mesage'=>$mesage, 'code'=>$code], function ($m) use ($user) {
+            $m->from('mail.focusapp@gmail.com', 'Focus Team');
+
+            $m->to($user->email, $user->name)->subject('Welcome to focus!');
+        });
+	dd('Mail sent');
+});
+
+
 
 $router->post('/login', ['uses'=>'UsersController@getToken']);
 $router->post('/register', ['uses'=>'UsersController@createUser']);
