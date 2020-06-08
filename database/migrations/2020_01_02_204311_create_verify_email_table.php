@@ -13,8 +13,15 @@ class CreateVerifyEmailTable extends Migration
      */
     public function up()
     {
-        Schema::create('verify_email', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('verify_mails', function (Blueprint $table) {
+	    $table->bigInteger('idUser')->unsigned()
+                ->foreign('idUser')
+                ->references('id')->on('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade')
+		->primary();
+
+	    $table->char('verification_code',8);
             $table->timestamps();
         });
     }

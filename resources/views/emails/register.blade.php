@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Test Mail</title>
+    <title>Register completed</title>
 </head>
 <body>
 	<h1>Hey {{$user}} welcome to Focus,</h1>

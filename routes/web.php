@@ -33,10 +33,15 @@ $router->get('/test_mail', function (Request $request) {
 
 
 
-$router->post('/login', ['uses'=>'UsersController@getToken']);
+$router->post('/login', ['uses'=>'UsersController@getUser']);
 $router->post('/register', ['uses'=>'UsersController@createUser']);
 
+
 $router->group(['middleware' => ['auth']], function () use ($router){
+
+$router->post('/verify', ['uses'=>'UsersController@verifyUser']);
+$router->get('/resend', ['uses'=>'UsersController@resendMail']);
+
 
     $router->group(['prefix' => 'users'], function () use ($router) {
         $router->get('/', ['uses' => 'UsersController@index']);

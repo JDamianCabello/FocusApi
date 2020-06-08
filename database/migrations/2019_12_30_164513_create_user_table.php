@@ -21,7 +21,7 @@ class CreateUserTable extends Migration
 
             $table->rememberToken();
             $table->string('api_token',60)->unique();
-
+	    $table->dateTime('verify_at',0)->nullable();
             //Incluye el modificado a y creado a.
             $table->timestamps();
 
