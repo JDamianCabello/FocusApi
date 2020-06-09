@@ -52,8 +52,6 @@ class SubjectsController extends Controller
 	}
 
 
-
-
     function delete(Request $request,$id)
     {
         $user = User::where('api_token', $request->header('Api-Token'))->first();
@@ -64,6 +62,14 @@ class SubjectsController extends Controller
         }
         if($user->id ==$subject->idUser) {
 	    $topicsDeleted =  Topic::all()->where('idSubject', $subject->id);
+
+
+        foreach($topicsDeleted as &$tmp){
+                $tmp->state = (int)$tmp->state;
+                $tmp->priority = (int)$tmp ->priority;
+                $tmp->isTask = $tmp->isTask == 0 ? false : true;
+        }
+
             $subject->delete();
 
             return response()->json(['error' => 'false', 'message' => 'Subject deleted Successfully','deletedSubject'=>$subject, 'topicsDeleted'=>$topicsDeleted->values()], 200);

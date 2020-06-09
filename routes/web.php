@@ -35,6 +35,7 @@ $router->get('/resend', ['uses'=>'UsersController@resendMail']);
     });
 
     $router->group(['prefix' => 'subject'], function () use ($router) {
+	$router->post('/restore', ['uses' => 'SubjectsController@restore']);
         $router->post('/', ['uses' => 'SubjectsController@add']);
         $router->get('/', ['uses' => 'SubjectsController@list']);
         $router->put('/{id}', ['uses' => 'SubjectsController@update']);
