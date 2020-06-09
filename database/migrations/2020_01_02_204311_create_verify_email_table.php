@@ -14,16 +14,17 @@ class CreateVerifyEmailTable extends Migration
     public function up()
     {
         Schema::create('verify_mails', function (Blueprint $table) {
-	    $table->bigInteger('idUser')->unsigned()
-                ->foreign('idUser')
-                ->references('id')->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('cascade')
-		->primary();
+           $table->unsignedBigInteger('idUser');
 
-	    $table->char('verification_code',8);
-            $table->timestamps();
-        });
+           $table->foreign('idUser')
+                    ->references('id')
+                    ->on('users')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
+
+    	$table->char('verification_code',8);
+       	$table->timestamps();
+       	});
     }
 
     /**
@@ -33,6 +34,6 @@ class CreateVerifyEmailTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('verify_email');
+        Schema::dropIfExists('verify_mails');
     }
 }

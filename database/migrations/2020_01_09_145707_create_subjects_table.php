@@ -15,11 +15,14 @@ class CreateSubjectsTable extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('idUser')->unsigned()
-                ->foreign('idUser')
-                ->references('id')->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+            $table->unsignedBigInteger('idUser');
+
+            $table->foreign('idUser')
+                    ->references('id')
+                    ->on('users')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
+
             $table->string('subject_name',50);
             $table->date('exam_date');
 	    $table->integer('color');

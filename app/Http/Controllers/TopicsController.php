@@ -21,10 +21,34 @@ class TopicsController extends Controller
 		$tmp->isTask = $tmp->isTask == 0 ? false : true;
 	}
 
-        return response()->json(['error'=>false,'message' => 'topic list', 'topicList' => $topics->values()], 200);
-	}
+                return response()->json(['error'=>false,'message' => 'topic list', 'topicList' => $topics->values()], 200);
+    }
+
+    function add(Request $request, $idSubject){
+	$TOTALMAXTOPICSTATE = 3;
+        $user = User::where('api_token', $request->header('Api-Token'))->first();
+
+        $topic = Topic::create([
+	    'idSubject' => $idSubject,
+            'name' => $request->name,
+            'isTask' => $request->isTask == false ? 0 : 1,
+            'state' => $request->state,
+            'priority' => $request->priority
+        ]);
 
 
+        $topic->state = (int)$topic->state;
+        $topic->priority = (int)$topic->priority;
+        $topic->isTask = $topic->isTask == 0 ? false : true;
+
+	$topics = Topic::all()->where('idSubject', $idSubject)->sum('state');
+	$totalSubjectTopics = Topic::all()->where('idSubject',$idSubject)->count();
+        $newPercent = (int)(($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE));
+
+
+
+        return response()->json(['error'=>'false','message' => 'Topic created sucefully', 'percent'=>$newPercent, 'topic' => $topic], 201);
+    }
 
 
     function delete(Request $request,$id)
@@ -36,7 +60,7 @@ class TopicsController extends Controller
             return response()->json(['error' => 'true', 'message' => 'the topic does not exist','topic'=>null], 202);
         }
 	$subject = Subject::where('id',$topic->idSubject)->first();
-        if($user->id == $subject->id) {
+        if($user->id == $subject->idUser) {
             $topic->delete();
 
             return response()->json(['error' => 'false', 'message' => 'Topic deleted Successfully','topic'=>$topic], 200);

@@ -14,18 +14,22 @@ class CreateTopicTable extends Migration
     public function up()
     {
         Schema::create('topics', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('idSubject')->unsigned()
-                ->foreign('idSubject_topic')
-                ->references('id')->on('subjects')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->string('name',50);
-	    $table->boolean('isTask');
-            $table->enum('state',['0','1','2','3']);
-      	    $table->enum('priority',['0','1','2']);
-	    $table->string('notes',250)->nullable();
-            $table->timestamps();
+
+	        $table->bigIncrements('id');
+		$table->bigInteger('idSubject')->unsigned();
+
+	        $table->foreign('idSubject')
+	            ->references('id')
+	            ->on('subjects')
+		    ->onUpdate('cascade')
+        	    ->onDelete('cascade');
+
+	        $table->string('name',50);
+	   	$table->boolean('isTask');
+	        $table->enum('state',['0','1','2','3']);
+	      	$table->enum('priority',['0','1','2']);
+		$table->string('notes',250)->nullable();
+        	$table->timestamps();
         });
     }
 
