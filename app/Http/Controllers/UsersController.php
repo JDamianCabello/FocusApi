@@ -69,10 +69,10 @@ class UsersController extends Controller
 		    $user->verify_at == null ? $user->verified = false : $user->verified = true;
                     return response()->json(['error'=>'false','message'=>'logged','user'=> $user], 200);
                 } else {
-                    return response()->json(['error'=>'true','message'=>'wrong login','api_token'=> ""], 406);
+                    return response()->json(['error'=>'true','message'=>'wrong login','api_token'=> ""], 401);
                 }
             } catch (ModelNotFoundException $e) {
-                return response()->json(['error'=>'true','message'=>'email not in database','api_token'=> null], 406);
+                return response()->json(['error'=>'true','message'=>'email not in database','api_token'=> ""], 402);
             }
     }
 

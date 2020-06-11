@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Mail;
 use \Illuminate\Mail\Message;
 use App\User;
@@ -22,36 +21,33 @@ use App\User;
 $router->post('/login', ['uses'=>'UsersController@getUser']);
 $router->post('/register', ['uses'=>'UsersController@createUser']);
 
-
 $router->group(['middleware' => ['auth']], function () use ($router){
 
-$router->post('/verify', ['uses'=>'UsersController@verifyUser']);
-$router->get('/resend', ['uses'=>'UsersController@resendMail']);
+	$router->post('/verify', ['uses'=>'UsersController@verifyUser']);
+    	$router->get('/resend', ['uses'=>'UsersController@resendMail']);
+
+    	$router->group(['prefix' => 'users'], function () use ($router) {
+        	$router->get('/', ['uses' => 'UsersController@index']);
+        	$router->delete('/', ['uses' => 'UsersController@delete']);
+    	});
+
+        $router->group(['prefix' => 'subject'], function () use ($router) {
+                $router->post('/', ['uses' => 'SubjectsController@add']);
+                $router->get('/', ['uses' => 'SubjectsController@getList']);
+                $router->put('/{id}', ['uses' => 'SubjectsController@update']);
+                $router->delete('/{id}', ['uses' => 'SubjectsController@delete']);
+        });
 
 
-    $router->group(['prefix' => 'users'], function () use ($router) {
-        $router->get('/', ['uses' => 'UsersController@index']);
-        $router->delete('/', ['uses' => 'UsersController@delete']);
-    });
+    	$router->group(['prefix' => 'topic'], function () use ($router) {
+        	$router->post('/{id}', ['uses' => 'TopicsController@add']);
+        	$router->get('/{id}', ['uses' => 'TopicsController@list']);
+        	$router->put('/{id}', ['uses' => 'TopicsController@update']);
+        	$router->delete('/{id}', ['uses' => 'TopicsController@delete']);
+    	});
 
-    $router->group(['prefix' => 'subject'], function () use ($router) {
-	$router->post('/restore', ['uses' => 'SubjectsController@restore']);
-        $router->post('/', ['uses' => 'SubjectsController@add']);
-        $router->get('/', ['uses' => 'SubjectsController@list']);
-        $router->put('/{id}', ['uses' => 'SubjectsController@update']);
-        $router->delete('/{id}', ['uses' => 'SubjectsController@delete']);
-    });
+    	$router->group(['prefix' => 'notification'], function () use ($router) {
+        	$router->get('/', ['uses' => 'NotificationController@getToday']);
+    	});
 
-    $router->group(['prefix' => 'topic'], function () use ($router) {
-        $router->post('/{id}', ['uses' => 'TopicsController@add']);
-        $router->get('/{id}', ['uses' => 'TopicsController@list']);});
-        $router->put('/{id}', ['uses' => 'TopicsController@update']);
-        $router->delete('/{id}', ['uses' => 'TopicsController@delete']);
-    });
-
-$router->get('/', function () use ($router) {
-    return $router->app->version();
 });
-
-
-

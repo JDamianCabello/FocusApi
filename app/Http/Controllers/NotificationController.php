@@ -8,10 +8,10 @@ use App\Topic;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
-class SubjectsController extends Controller
+class NotificationController extends Controller
 {
 
-	function getList(Request $request){
+	function getToday(Request $request){
 
         $TOTALMAXTOPICSTATE = 3;
 

@@ -31,7 +31,7 @@ class TopicsController extends Controller
         $topic = Topic::create([
 	    'idSubject' => $idSubject,
             'name' => $request->name,
-            'isTask' => $request->isTask == false ? 0 : 1,
+            'isTask' => $request->isTask == false ? 1 : 0,
             'state' => $request->state,
             'priority' => $request->priority
         ]);
