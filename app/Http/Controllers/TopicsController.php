@@ -31,7 +31,7 @@ class TopicsController extends Controller
         $topic = Topic::create([
 	    'idSubject' => $idSubject,
             'name' => $request->name,
-            'isTask' => $request->isTask == false ? 1 : 0,
+            'isTask' => $request->isTask == 'true' ? 1 : 0,
             'state' => $request->state,
             'priority' => $request->priority
         ]);
@@ -42,8 +42,13 @@ class TopicsController extends Controller
         $topic->isTask = $topic->isTask == 0 ? false : true;
 
 	$topics = Topic::all()->where('idSubject', $idSubject)->sum('state');
-	$totalSubjectTopics = Topic::all()->where('idSubject',$idSubject)->count();
-        $newPercent = (int)(($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE));
+
+        if($topics == 0){
+		$newPercent = 0;
+        }else{
+                $totalSubjectTopics = Topic::all()->where('idSubject',$idSubject)->count();
+                $newPercent = (int)(($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE));
+        }
 
 
 
@@ -53,44 +58,72 @@ class TopicsController extends Controller
 
     function delete(Request $request,$id)
     {
+
+	$TOTALMAXTOPICSTATE = 3;
+
         $user = User::where('api_token', $request->header('Api-Token'))->first();
         try {
             $topic = Topic::findOrFail($id);
         }catch (ModelNotFoundException $e){
-            return response()->json(['error' => 'true', 'message' => 'the topic does not exist','topic'=>null], 202);
+            return response()->json(['error' => true, 'message' => 'the topic does not exist','topic'=>null], 202);
         }
+
 	$subject = Subject::where('id',$topic->idSubject)->first();
         if($user->id == $subject->idUser) {
+	    $topicDeleted = $topic;
             $topic->delete();
 
-            return response()->json(['error' => 'false', 'message' => 'Topic deleted Successfully','topic'=>$topic], 200);
+        $topics = Topic::all()->where('idSubject', $subject->id)->sum('state');
+
+        if($topics == 0){
+                $newPercent = 0;
+        }else{
+                $totalSubjectTopics = Topic::all()->where('idSubject',$subject->id)->count();
+                $newPercent = (int)(($topics * 100) / ($totalSubjectTopics * $TOTALMAXTOPICSTATE));
+        }
+
+        $topicDeleted->state = (int)$topic->state;
+        $topicDeleted->priority = (int)$topic->priority;
+        $topicDeleted->isTask = $topic->isTask == 0 ? false : true;
+
+            return response()->json(['error' => false, 'message' => 'Topic deleted Successfully','topicDeleted'=>$topicDeleted, 'newPercent' => $newPercent], 200);
         }
         else
-            return response()->json(['error' => 'false', 'message' => 'Not your topic', 'deleted topic' => null], 200);
+            return response()->json(['error' => false, 'message' => 'Not your topic', 'deleted topic' => null], 200);
 
 
 
     }
 
-    public function update($id, Request $request)
+    public function update(Request $request, $idTopic)
     {
         $user = User::where('api_token', $request->header('Api-Token'))->first();
-        $topic = Topic::findOrFail($id);
+        $topic = Topic::findOrFail($idTopic);
 	$subject = Subject::where('id',$topic->idSubject)->first();
 
 	$oldTopic = $topic;
         if($user->id == $subject->idUser) {
-            Subject::findOrFail($id)->update([
+            Topic::findOrFail($idTopic)->update([
                 'name' => $request->name,
-                'isTask' => $request->isTask,
+                'isTask' => $request->isTask == 'true' ? 1 : 0,
                 'state' => $request->state,
                 'priority' => $request->priority,
                 'notes' => $request->notes
             ]);
+	    $topic = Topic::findOrFail($idTopic);
 
-            return response()->json(['error' => 'false', 'message' => 'topic updated', 'oldTopic'=>$oldTopic, 'updatedTopic'=>$topic], 200);
+        $oldTopic->state = (int)$topic->state;
+        $oldTopic->priority = (int)$topic->priority;
+        $oldTopic->isTask = $topic->isTask == 0 ? false : true;
+
+        $topic->state = (int)$topic->state;
+        $topic->priority = (int)$topic->priority;
+        $topic->isTask = $topic->isTask == 0 ? false : true;
+
+
+            return response()->json(['error' => false, 'message' => 'topic updated', 'oldTopic'=>$oldTopic, 'updatedTopic'=>$topic], 200);
         }
         else
-            return response()->json(['error' => 'false', 'message' => 'Not your topic', 'topic' => null], 200);
+            return response()->json(['error' => true, 'message' => 'Not your topic', 'topic' => null], 200);
     }
 }

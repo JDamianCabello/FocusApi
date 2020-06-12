@@ -92,6 +92,8 @@ class SubjectsController extends Controller
                 'color' => $request->color,
                 'iconId' => $request->iconId
             ]);
+	    $subject = Subject::findOrFail($id);
+
 
             return response()->json(['error' => 'false', 'message' => 'subject updated', 'oldSubject'=>$oldSubject, 'updatedSubject'=>$subject], 200);
         }
