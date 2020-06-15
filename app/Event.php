@@ -4,15 +4,16 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Subject extends Model
+class Event extends Model
 {
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-       protected $fillable = [
-         'idUser','subject_name','exam_date','color','iconId','haveEvent'
+    protected $fillable = [
+       'idUser','event_name', 'event_resume', 'event_date','event_iconId', 'event_color','appnotification','event_notes','idSubject'
     ];
 
     /**
@@ -21,7 +22,7 @@ class Subject extends Model
      * @var array
      */
     protected $hidden = [
-        'idUser', 'created_at', 'updated_at'
+	'created_at', 'updated_at','idUser'
+
     ];
 }
-

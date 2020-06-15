@@ -16,7 +16,7 @@ class CreateEventsTable extends Migration
         Schema::create('events', function (Blueprint $table) {
            $table->bigIncrements('id');
 
-	   $table->unsignedBigInteger('idUser');
+	   $table->unsignedBigInteger('idUser')->nullable();
 
            $table->foreign('idUser')
                     ->references('id')
@@ -25,11 +25,22 @@ class CreateEventsTable extends Migration
                     ->onDelete('cascade');
 
             $table->string('event_name',50);
-	    $table->string('event_resume',100)->nullable;
+	    $table->string('event_resume',50)->nullable;
             $table->date('event_date');
+
+	    $table->unsignedBigInteger('idSubject')->nullable;
+
+
+            $table->foreign('idSubject')
+                    ->references('id')
+                    ->on('subjects')
+                    ->onUpdate('cascade')
+                    ->onDelete('cascade');
+
+
 	    $table->integer('event_color');
 	    $table->integer('event_iconId');
-	    $table->enum('event_type',['0','1','2','4']);
+	    $table->boolean('appnotification');
 	    $table->string('event_notes',250)->nullable();
             $table->timestamps();
         });

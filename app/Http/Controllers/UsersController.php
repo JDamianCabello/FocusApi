@@ -35,10 +35,9 @@ class UsersController extends Controller
 		'verify_at' => null
         	]);
 
-	        $mesage = ' we are excited to see you join in our team!';
-        	$code = Str::random(8);
+	        $code = Str::random(8);
 
-	        Mail::send('emails.register', ['user' => $user->name, 'mesage'=>$mesage, 'code'=>$code], function ($m) use ($user) {
+	        Mail::send('emails.register', ['user' => $user->name, 'code'=>$code], function ($m) use ($user) {
 	            $m->from('mail.focusapp@gmail.com', 'Focus Team');
 	            $m->to($user->email, $user->name)->subject('Welcome to focus!');
 	        });

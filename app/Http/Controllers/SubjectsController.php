@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Subject;
 use App\User;
 use App\Topic;
+use App\Event;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -22,6 +23,7 @@ class SubjectsController extends Controller
         foreach($subject as &$tmp){
                 $topics = Topic::all()->where('idSubject', $tmp->id)->sum('state');
                 $tmp->exam_date = date('d-m-Y',strtotime($tmp->exam_date));
+		$tmp->haveEvent = $tmp->haveEvent == 0 ? false : true;
                 if($topics == 0){
                         $tmp->percent = 0;
                 }
@@ -45,10 +47,27 @@ class SubjectsController extends Controller
             'subject_name' => $request->subject_name,
             'exam_date' => date('Y-m-d',strtotime($request->date)),
 	    'color' => $request->color,
-            'iconId' => $request->iconId
+            'iconId' => $request->iconId,
+	    'haveEvent' =>  $request->makeEvent == 'true' ? 1 : 0,
         ]);
 
-        return response()->json(['error'=>'false','message' => 'subject created sucefully', 'subject' => $subject], 201);
+	//Cuando se crea una asignatura el sistema crea un avento asociado a la misma si se le indica.
+	if($request->makeEvent == 'true'){
+		Event::create([
+		    'idUser' => $user->id,
+		    'event_name' => $request->subject_name,
+		    'event_resume' => 'Exam of '.$request->subject_name,
+	    	    'event_date' =>  date('Y-m-d',strtotime($request->date)),
+		    'idSubject' => $subject->id,
+	            'event_color' => $request->color,
+	            'event_iconId' => $request->iconId,
+		    'appnotification' => 1,
+		    'event_notes' => 'Auto generated with subject '.$request->subject_name
+        	]);
+	}
+
+	$subject->haveEvent = $subject->haveEvent == 0 ? false : true;
+        return response()->json(['error'=>false,'message' => 'subject created sucefully', 'subject' => $subject], 201);
 	}
 
 
@@ -58,7 +77,7 @@ class SubjectsController extends Controller
         try {
             $subject = Subject::findOrFail($id);
         }catch (ModelNotFoundException $e){
-            return response()->json(['error' => 'true', 'message' => 'the subject does not exist','subject'=>null], 202);
+            return response()->json(['error' => true, 'message' => 'the subject does not exist','subject'=>null], 202);
         }
         if($user->id ==$subject->idUser) {
 	    $topicsDeleted =  Topic::all()->where('idSubject', $subject->id);
@@ -71,11 +90,11 @@ class SubjectsController extends Controller
         }
 
             $subject->delete();
-
-            return response()->json(['error' => 'false', 'message' => 'Subject deleted Successfully','deletedSubject'=>$subject, 'topicsDeleted'=>$topicsDeleted->values()], 200);
+	    $subject->haveEvent = $subject->haveEvent == 0 ? false : true;
+            return response()->json(['error' => false, 'message' => 'Subject deleted Successfully','deletedSubject'=>$subject, 'topicsDeleted'=>$topicsDeleted->values()], 200);
         }
         else{
-            return response()->json(['error' => 'false', 'message' => 'not your subject', 'deleted subject' => null], 200);
+            return response()->json(['error' => false, 'message' => 'not your subject', 'deleted subject' => null], 200);
 	}
     }
 
@@ -90,15 +109,50 @@ class SubjectsController extends Controller
                 'subject_name' => $request->subject_name,
                 'exam_date' => date('Y-m-d',strtotime($request->date)),
                 'color' => $request->color,
-                'iconId' => $request->iconId
+                'iconId' => $request->iconId,
+		'haveEvent' =>  $request->makeEvent == 'true' ? 1 : 0
             ]);
 	    $subject = Subject::findOrFail($id);
 
+	$event = Event::where('idSubject',$subject->id)->first();
+	if($request->makeEvent == 'true'){
+		if(is_null($event)){
+	                Event::create([
+	                    'idUser' => $user->id,
+	                    'event_name' => $request->subject_name,
+        	            'event_resume' => 'Exam of '.$request->subject_name,
+                	    'event_date' =>  date('Y-m-d',strtotime($request->date)),
+	                    'idSubject' => $subject->id,
+        	            'event_color' => $request->color,
+                	    'event_iconId' => $request->iconId,
+	                    'appnotification' => 1,
+	                    'event_notes' => 'Auto generated with subject '.$request->subject_name
+        	        ]);
+		}else{
+	                $event->update([
+        	            'idUser' => $user->id,
+                	    'event_name' => $request->subject_name,
+	                    'event_resume' => 'Exam of '.$request->subject_name,
+        	            'event_date' =>  date('Y-m-d',strtotime($request->date)),
+                	    'idSubject' => $subject->id,
+	                    'event_color' => $request->color,
+        	            'event_iconId' => $request->iconId,
+                	    'appnotification' => 1,
+	                    'event_notes' => 'Auto generated with subject '.$request->subject_name
+        	        ]);
+		}
+	}else{
+		if(!is_null($event)){
+			$event->delete();
+		}
+	}
+	    $subject->haveEvent = $subject->haveEvent == 0 ? false : true;
+	    $oldSubject->haveEvent = $oldSubject->haveEvent == 0 ? false : true;
 
-            return response()->json(['error' => 'false', 'message' => 'subject updated', 'oldSubject'=>$oldSubject, 'updatedSubject'=>$subject], 200);
+            return response()->json(['error' => false, 'message' => 'subject updated', 'oldSubject'=>$oldSubject, 'updatedSubject'=>$subject], 200);
         }
         else{
-            return response()->json(['error' => 'false', 'message' => 'not your subject', 'subject' => null], 200);
+            return response()->json(['error' => false, 'message' => 'not your subject', 'subject' => null], 200);
 	}
     }
 }

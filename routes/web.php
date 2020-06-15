@@ -46,8 +46,13 @@ $router->group(['middleware' => ['auth']], function () use ($router){
         	$router->delete('/{id}', ['uses' => 'TopicsController@delete']);
     	});
 
-    	$router->group(['prefix' => 'notification'], function () use ($router) {
-        	$router->get('/', ['uses' => 'NotificationController@getToday']);
+    	$router->group(['prefix' => 'event'], function () use ($router) {
+        	$router->get('/{date}', ['uses' => 'EventController@getDay']);
+                $router->get('/', ['uses' => 'EventController@getAll']);
+		$router->get('/today/notifications', ['uses' => 'EventController@getNotifications']);
+                $router->post('/', ['uses' => 'EventController@add']);
+                $router->delete('/{id}', ['uses' => 'EventController@delete']);
+		$router->put('/{id}', ['uses' => 'EventController@update']);
     	});
 
 });

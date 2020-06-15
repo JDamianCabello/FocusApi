@@ -27,6 +27,8 @@ class CreateSubjectsTable extends Migration
             $table->date('exam_date');
 	    $table->integer('color');
 	    $table->integer('iconId');
+	    $table->boolean('haveEvent');
+
 	    $table->timestamps();
         });
     }
