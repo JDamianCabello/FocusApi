@@ -21,6 +21,10 @@ use App\User;
 $router->post('/login', ['uses'=>'UsersController@getUser']);
 $router->post('/register', ['uses'=>'UsersController@createUser']);
 
+$router->get('/forgotpassword/{email}', ['uses'=>'UsersController@rescoverPasswordMail']);
+$router->post('/forgotpassword/', ['uses'=>'UsersController@updatePassword']);
+
+
 $router->group(['middleware' => ['auth']], function () use ($router){
 
 	$router->post('/verify', ['uses'=>'UsersController@verifyUser']);

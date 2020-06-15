@@ -121,13 +121,20 @@ class UsersController extends Controller
         }
 
 
-    function rescoverPasswordMail(Request $request){;
-        $user = User::where('api_token', $request->header('Api-Token'))->first();
+    function rescoverPasswordMail($email, Request $request){;
+        $user = User::where('email', $email)->first();
+
+
+        if(is_null($user)){
+                return response()->json(['error'=>true, 'message'=>'Email not in database'], 201);
+        }
+
 
         VerifyMail::where('idUser', $user->id)->update([
         'verification_code' => Str::random(8)
         ]);
         $verify = VerifyMail::where('idUser', $user->id)->first();
+
 
         $mesage = ' have problem triying to logging in the app?, dont care :D';
 
@@ -140,9 +147,29 @@ class UsersController extends Controller
         }
 
 
+    function updatePassword(Request $request)
+    {
+	$verify = VerifyMail::where('verification_code',$request->verification_code)->first();
+	if(!is_null($verify)){
+
+          $user = User::findOrFail($verify->idUser);
+	  VerifyMail::where('idUser', $user->id)->update([
+		'verification_code' => Str::random(8)
+	  ]);
+
+          $user->update([
+              'name' => $user->name,
+              'email' => $user->email,
+              'password' => Hash::make($request->password)
+          ]);
+          return response()->json(['error'=>false, 'message'=>'User password updated'], 200);
+	}
+
+	return response()->json(['error'=>true, 'message'=>'Wrong verification code'], 200);
+    }
 
 
-    public function update($id, Request $request)
+    function update($id, Request $request)
     {
             $user = User::findOrFail($id);
             $user->update([

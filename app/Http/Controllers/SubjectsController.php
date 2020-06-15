@@ -146,8 +146,16 @@ class SubjectsController extends Controller
 			$event->delete();
 		}
 	}
+            $subject->state = (int)$subject->state;
+            $subject->priority = (int)$subject->priority;
+            $subject->isTask = $subject->isTask == 0 ? false : true;
 	    $subject->haveEvent = $subject->haveEvent == 0 ? false : true;
-	    $oldSubject->haveEvent = $oldSubject->haveEvent == 0 ? false : true;
+
+
+            $oldSubject->state = (int)$oldSubject->state;
+            $oldSubject->priority = (int)$oldSubject->priority;
+            $oldSubject->isTask = $oldSubject->isTask == 0 ? false : true;
+            $oldSubject->haveEvent = $oldSubject->haveEvent == 0 ? false : true;
 
             return response()->json(['error' => false, 'message' => 'subject updated', 'oldSubject'=>$oldSubject, 'updatedSubject'=>$subject], 200);
         }

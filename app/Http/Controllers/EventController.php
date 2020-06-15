@@ -20,6 +20,7 @@ class EventController extends Controller
 
         foreach($events as &$tmp){
 		$tmp->event_date = date('d-m-Y',strtotime($tmp->event_date));
+		$tmp->idSubject = $tmp->idSubject == null ? -1 : $tmp->idSubject;
                 $tmp->appnotification = $tmp->appnotification == 0 ? false : true;
         }
 
@@ -36,6 +37,7 @@ class EventController extends Controller
         foreach($events as &$tmp){
 		$tmp->event_date = date('d-m-Y',strtotime($tmp->event_date));
                 $tmp->appnotification = $tmp->appnotification == 0 ? false : true;
+		$tmp->idSubject = $tmp->idSubject == null ? -1 : $tmp->idSubject;
         }
 
         return response()->json(['date' => date('d-m-y'),'error'=>false,'events' => $events->values()], 200);
@@ -55,6 +57,7 @@ class EventController extends Controller
         foreach($events as &$tmp){
                 $tmp->event_date = date('d-m-Y',strtotime($tmp->event_date));
                 $tmp->appnotification = $tmp->appnotification == 0 ? false : true;
+		$tmp->idSubject = $tmp->idSubject == null ? -1 : $tmp->idSubject;
         }
 
 
